@@ -58,8 +58,11 @@ let AuthService = class AuthService {
             if (!pwMatches)
                 throw new common_1.ForbiddenException('Credentials incorrect');
             delete user.password;
+            delete user.createdAt;
+            delete user.updatedAt;
+            const name = `${user.firstName} ${user.lastname}`;
             const token = await this.signToken(user.id, user.email);
-            return { message: 'login successfully', token };
+            return { message: 'login successfully', token, user: { ...user, name } };
         }
         catch (error) {
             return error;

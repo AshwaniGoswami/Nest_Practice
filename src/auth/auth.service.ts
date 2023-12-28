@@ -42,12 +42,20 @@ export class AuthService {
           email: dto.email,
         },
       });
+
       if (!user) throw new ForbiddenException('Credentials incorrect');
+
       const pwMatches = await argon.verify(user.password, dto.password);
       if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
+
       delete user.password;
+      delete user.createdAt;
+      delete user.updatedAt;
+
+      const name = `${user.firstName} ${user.lastname}`;
       const token = await this.signToken(user.id, user.email);
-      return { message: 'login successfully', token };
+
+      return { message: 'login successfully', token, user: { ...user, name } };
     } catch (error) {
       return error;
     }
